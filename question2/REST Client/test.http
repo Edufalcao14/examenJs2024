@@ -1,0 +1,101 @@
+@baseUrl = http://localhost:3000
+
+### 1. Create an evaluation by sending a correct score for the user named pinkLady
+
+#### 1.1 First, log in as pinkLady
+# @name pinkLady
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+    "username": "pinkLady",
+    "password": "yourpassword"
+}
+
+
+#### 1.2 First, log in as GreenMan
+# @name pinkLady
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+    "username": "greenMan",
+    "password": "yourpassword"
+}
+
+#### 1.2 Define a request variable to store pinkLady's token
+@pinkLadyToken = {{pinkLady.response.body.token}}
+
+#### 1.3 Create an evaluation for a valid quote
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+Authorization:{{pinkLady.response.body.token}}
+
+{
+    "id": 1,
+    "score": 10
+}
+
+### 2. Create an evaluation by sending a correct score for the user named greenMan
+
+#### 2.1 First, log in as greenMan
+# @name greenMan
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+    "username": "greenMan",
+    "password": "yourpassword"
+}
+
+#### 2.2 Define a request variable to store greenMan's token
+@greenManToken = {{greenMan.response.body.token}}
+
+#### 2.3 Create an evaluation for a valid quote
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+Authorization:{{greenMan.response.body.token}}
+
+{
+    "id": 1,
+    "score": 7
+}
+
+### 3. Attempt to create an evaluation by sending an incorrect score for pinkLady
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+Authorization:{{pinkLady.response.body.token}}
+
+{
+    "id": 1,
+    "score": 11
+}
+
+### 4. Attempt to create an evaluation for a non-existent quote for pinkLady
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+Authorization:{{pinkLady.response.body.token}}
+
+{
+    "id": 999,
+    "score": 5
+}
+
+### 5. Attempt to create an evaluation for a quote that has already been evaluated by greenMan
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+Authorization:{{greenMan.response.body.token}}
+
+{
+    "id": 1,
+    "score": 7
+}
+
+### 6. Attempt to create an evaluation for a quote as an anonymous user (unauthenticated)
+POST {{baseUrl}}/quotes/evaluate
+Content-Type: application/json
+
+{
+    "id": 1,
+    "score": 8
+}
